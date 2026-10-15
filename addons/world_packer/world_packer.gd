@@ -5,7 +5,9 @@ class_name WorldPacker
 ## files of no sector (WORLD_FILES) whole into worlds/<name>/WORLD_PACK, and what is drawn of its
 ## sectors into a pack a block (worlds/<name>/<block>.pck), sector by sector in the order of their
 ## ids, a sector's files one after another (SECTOR_FILES) - so a sector may be read out of the pack
-## alone. Every file is under RESOURCES_DIR/<name>/ in the packs, at its place in the sources. Needs
+## alone. Every file is under RESOURCES_DIR/<name>/ in the packs, at its place in the sources. Its
+## description for the game, worlds/<name>.json, is made of its WorldDescription (WorldDescription.FILE
+## beside its sources) as it is packed (pack()). Needs
 ## nothing of libmaszyna, so a world's packs build without it (a world's `make packs`, its CI); the
 ## names are libmaszyna's MaszynaWorld's (WORLDS_DIR, RESOURCES_DIR, WORLD_PACK, BLOCKS_DIR,
 ## SECTORS_DIR, PACK_EXTENSION, SECTOR_FILE_SUFFIXES, SCENERY_FILE, SCENARIO_FILE).
@@ -22,6 +24,8 @@ const SECTORS_DIR: String = "sectors"
 const WORLD_FILES: PackedStringArray = ["world.scn", "scenery.res", "scenario.res"]
 ## What is drawn of a sector and its terrain, the suffixes of its id
 const SECTOR_FILES: PackedStringArray = [".drawn.scn", ".terrain.res"]
+## The world's description (a class_name is unknown to a headless run that scanned no project)
+const Description: GDScript = preload("world_description.gd")
 
 
 ## Writes the pack [param pck_path] of [param files] (path in the pack -> source file); false on failure
@@ -40,13 +44,33 @@ static func write_pack(pck_path: String, files: Dictionary[String, String]) -> b
 
 
 ## The world [param world_name] whose sources are in [param dir] packed whole - WORLD_PACK and every
-## block's pack - into [param out_dir]/WORLDS_DIR/<name>/; false on failure
+## block's pack - into [param out_dir]/WORLDS_DIR/<name>/, with its description <name>.json beside
+## them; false on failure
 static func pack(dir: String, world_name: String, out_dir: String) -> bool:
     if not pack_world(dir, world_name, out_dir):
         return false
     for block: String in blocks(dir):
         if not pack_block(dir, world_name, block, out_dir):
             return false
+    return write_description(dir, world_name, out_dir)
+
+
+## The world's description for the game, [param out_dir]/WORLDS_DIR/<name>.json, made of its
+## WorldDescription (its FILE in [param dir]); false on failure
+static func write_description(dir: String, world_name: String, out_dir: String) -> bool:
+    var world: Description = ResourceLoader.load(dir.path_join(Description.FILE), "",
+            ResourceLoader.CACHE_MODE_IGNORE) as Description
+    if not world:
+        push_error("World packer: no %s in %s" % [Description.FILE, dir])
+        return false
+    var path: String = out_dir.path_join(WORLDS_DIR).path_join(world_name + "." + DESCRIPTION_EXTENSION)
+    DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+    var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+    if not file:
+        push_error("World packer: cannot write %s" % path)
+        return false
+    file.store_string(JSON.stringify(world.game_description(world_name, world_name.path_join(WORLD_PACK),
+            RESOURCES_DIR.path_join(world_name).path_join(WORLD_FILES[0])), "\t"))
     return true
 
 

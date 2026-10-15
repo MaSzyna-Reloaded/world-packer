@@ -1,0 +1,56 @@
+@tool
+extends Resource
+class_name WorldDescription
+## What a world of the game's own format is, apart from its files: its title and description (the
+## scenario selector's), its frame (the projection its coordinates are in and their origin), its
+## middle, where a player starts, and what it is drawn with - the world assets' packs it mounts, its
+## biomes, its terrain's atlas. Kept beside the world's sources (FILE in worlds/<name>/), edited in
+## the inspector; the game's description of the world (worlds/<name>.json, libmaszyna's
+## MaszynaWorld.read_description()) is made of it when the world is packed (WorldPacker.pack()).
+
+## Beside the world's sources
+const FILE: String = "description.tres"
+## The .json's format the game reads (libmaszyna's MaszynaWorld.FORMAT)
+const FORMAT: int = 5
+
+@export var title: String = ""
+@export_multiline var description: String = ""
+@export_group("Frame")
+## The projection the world's coordinates are in: its name and EPSG code
+@export var projection: String = ""
+@export var epsg: int = 0
+## The projected metres (east, north) of the world's origin
+@export var origin: Vector2 = Vector2.ZERO
+@export_group("")
+## The world's middle: latitude, longitude
+@export var center: Vector2 = Vector2.ZERO
+## Where a player starts, in the world's coordinates
+@export var player_start: Vector3 = Vector3.ZERO
+@export_group("Drawn with")
+## The world assets' packs it mounts, in the order they are mounted
+@export var assets: PackedStringArray = ["common_terrain", "common_facades", "common_biomes"]
+## The scene of the biomes it grows (its node Vegetation)
+@export var biomes: String = "res://world_assets/common_biomes/biomes.tscn"
+## The terrain's atlas (Terrain3DAssets)
+@export var terrain_assets: String = "res://world_assets/common_terrain/assets.res"
+## Side of a Terrain3D region: a sector's [m]
+@export var region_size: int = 1024
+
+
+## The game's description of the world [param world_name] (MaszynaWorld.read_description()): this
+## one's fields with where its pack [param pck] and its scene [param scene] are (WorldPacker's)
+func game_description(world_name: String, pck: String, scene: String) -> Dictionary:
+    return {
+        "format": FORMAT,
+        "name": world_name,
+        "title": title,
+        "description": description,
+        "frame": {"projection": projection, "epsg": epsg, "origin": [origin.x, origin.y]},
+        "center": [center.x, center.y],
+        "player_start": [player_start.x, player_start.y, player_start.z],
+        "pck": pck,
+        "scene": scene,
+        "assets": assets,
+        "biomes": biomes,
+        "terrain": {"assets": terrain_assets, "region_size": region_size},
+    }
