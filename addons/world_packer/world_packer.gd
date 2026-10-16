@@ -24,6 +24,10 @@ const SECTORS_DIR: String = "sectors"
 const WORLD_FILES: PackedStringArray = ["world.scn", "scenery.res", "scenario.res"]
 ## What is drawn of a sector, its terrain and its roads, the suffixes of its id
 const SECTOR_FILES: PackedStringArray = [".drawn.scn", ".terrain.res", ".roads.res"]
+## The world's low-poly preview (the scenery importer's SIWorldPreview) beside its scene, packed alone
+## into worlds/<name>/PREVIEW_PACK: a screen choosing a world mounts only it
+const PREVIEW_FILE: String = "preview.res"
+const PREVIEW_PACK: String = "preview.pck"
 ## The world's description (a class_name is unknown to a headless run that scanned no project)
 const Description: GDScript = preload("world_description.gd")
 
@@ -48,6 +52,8 @@ static func write_pack(pck_path: String, files: Dictionary[String, String]) -> b
 ## them; false on failure
 static func pack(dir: String, world_name: String, out_dir: String) -> bool:
     if not pack_world(dir, world_name, out_dir):
+        return false
+    if FileAccess.file_exists(dir.path_join(PREVIEW_FILE)) and not pack_preview(dir, world_name, out_dir):
         return false
     for block: String in blocks(dir):
         if not pack_block(dir, world_name, block, out_dir):
@@ -82,6 +88,17 @@ static func pack_world(dir: String, world_name: String, out_dir: String) -> Stri
         if FileAccess.file_exists(dir.path_join(file)):
             files[RESOURCES_DIR.path_join(world_name).path_join(file)] = dir.path_join(file)
     var pck_path: String = out_dir.path_join(WORLDS_DIR).path_join(world_name).path_join(WORLD_PACK)
+    return pck_path if write_pack(pck_path, files) else ""
+
+
+## The world's preview (PREVIEW_FILE in [param dir]) packed into [param out_dir]/WORLDS_DIR/<name>/
+## PREVIEW_PACK; returns the pack's path, "" on failure or with no preview
+static func pack_preview(dir: String, world_name: String, out_dir: String) -> String:
+    var source: String = dir.path_join(PREVIEW_FILE)
+    if not FileAccess.file_exists(source):
+        return ""
+    var files: Dictionary[String, String] = {RESOURCES_DIR.path_join(world_name).path_join(PREVIEW_FILE): source}
+    var pck_path: String = out_dir.path_join(WORLDS_DIR).path_join(world_name).path_join(PREVIEW_PACK)
     return pck_path if write_pack(pck_path, files) else ""
 
 
