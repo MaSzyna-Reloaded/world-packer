@@ -22,8 +22,8 @@ const BLOCKS_DIR: String = "blocks"
 const SECTORS_DIR: String = "sectors"
 ## The world's scene, scenery and scenario, beside each other
 const WORLD_FILES: PackedStringArray = ["world.scn", "scenery.res", "scenario.res"]
-## What is drawn of a sector and its terrain, the suffixes of its id
-const SECTOR_FILES: PackedStringArray = [".drawn.scn", ".terrain.res"]
+## What is drawn of a sector, its terrain and its roads, the suffixes of its id
+const SECTOR_FILES: PackedStringArray = [".drawn.scn", ".terrain.res", ".roads.res"]
 ## The world's description (a class_name is unknown to a headless run that scanned no project)
 const Description: GDScript = preload("world_description.gd")
 
