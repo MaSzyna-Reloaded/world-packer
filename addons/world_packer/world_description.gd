@@ -35,6 +35,11 @@ const FORMAT: int = 5
 @export var terrain_assets: String = "res://world_assets/common_terrain/assets.res"
 ## Side of a Terrain3D region: a sector's [m]
 @export var region_size: int = 1024
+@export_group("Export")
+## The sectors exported as far terrain only (WorldPacker): no block's pack holds them, the world's far
+## terrain stands for them - a range of mountains seen, not walked (the scenery importer's Project >
+## Tools > "Scenery sectors LOD...")
+@export var far_sectors: PackedStringArray = []
 
 
 ## The game's description of the world [param world_name] (MaszynaWorld.read_description()): this

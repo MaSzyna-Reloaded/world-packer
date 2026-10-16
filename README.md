@@ -6,8 +6,9 @@ Packs the game's worlds and what they share into the packs the game mounts - God
 - `WorldPacker` (`world_packer.gd`): a world's sources (`world.scn`, `scenery.res`, `scenario.res`,
   `blocks/<block>/sectors/<id>.drawn.scn|.terrain.res`) into a worlds directory given (the game's
   `worlds/`): `<name>/world.pck`, a pack a block and `<name>.json`, every file under
-  `res://worlds/<name>/`. Used by the scenery importer and by a world's
-  repository (`export_world.gd`).
+  `res://worlds/<name>/`; `far/<block>.res` (the far terrain) into `<name>/far.pck`, and the
+  sectors of the description's `far_sectors` left out of the blocks' packs (exported as far terrain
+  only). Used by the scenery importer and by a world's repository (`export_world.gd`).
 - `WorldAssetsPacker` (`world_assets_packer.gd`): every `res://world_assets/<pack>/` of a project into
   `world_assets/<pack>.pck`, imported files as Godot's export takes them, nodes of the group
   `world_assets_preview` left out. Used by the world assets' repository (`export_assets.gd`).
