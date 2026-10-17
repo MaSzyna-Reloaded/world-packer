@@ -6,7 +6,8 @@ class_name WorldDescription
 ## middle, where a player starts, and what it is drawn with - the world assets' packs it mounts, its
 ## biomes, its terrain's atlas. Kept beside the world's sources (FILE in worlds/<name>/), edited in
 ## the inspector; the game's description of the world (worlds/<name>.json, libmaszyna's
-## MaszynaWorld.read_description()) is made of it when the world is packed (WorldPacker.pack()).
+## MaszynaWorld.read_description()) is made of it when the world is packed (WorldPacker.pack()). Its
+## era (era_preset, era_year) is the scenery importer's alone: the game gets the world built of it.
 
 ## Beside the world's sources
 const FILE: String = "description.tres"
@@ -35,6 +36,13 @@ const FORMAT: int = 5
 @export var terrain_assets: String = "res://world_assets/common_terrain/assets.res"
 ## Side of a Terrain3D region: a sector's [m]
 @export var region_size: int = 1024
+@export_group("Era")
+## What the world is built with, the era's (the scenery importer's EraPreset, builder-presets): a preset
+## of the world assets' common_eras (res://world_assets/common_eras/<era>.tres); "" the contemporary one
+@export var era_preset: String = ""
+## The year the world stands in: what was not built by then, or was taken down, is left out of it (the
+## description's start and end years, OSM's start_date and end_date); 0: today, nothing left out
+@export var era_year: int = 0
 @export_group("Export")
 ## The sectors exported as far terrain only (WorldPacker): no block's pack holds them, the world's far
 ## terrain stands for them - a range of mountains seen, not walked (the scenery importer's Project >
